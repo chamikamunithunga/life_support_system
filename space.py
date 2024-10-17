@@ -6,6 +6,10 @@ from sklearn.ensemble import IsolationForest, RandomForestClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from twilio.rest import Client
 
 class LifeSupportSystem:
     def __init__(self):
@@ -20,6 +24,49 @@ class LifeSupportSystem:
         self.anomaly_detector = IsolationForest(contamination=0.1)  # Anomaly detection model
         self.health_model = RandomForestClassifier()  # Health prediction model
         self.num_crew_members = 5  # Example number of crew members
+
+    def send_email(self, subject, body):
+        sender_email = "your_email@gmail.com"  # Replace with your email
+        receiver_email = "recipient_email@gmail.com"  # Replace with the recipient's email
+        password = "your_password"  # Replace with your email account password
+
+        # Create the email
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        try:
+            # Set up the server
+            server = smtplib.SMTP('smtp.gmail.com', 587)  # Use your email service's SMTP server
+            server.starttls()  # Enable security
+            server.login(sender_email, password)  # Login to your email
+            server.sendmail(sender_email, receiver_email, msg.as_string())  # Send the email
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+        finally:
+            server.quit()  # Logout and close the connection
+
+    def send_sms(self, body):
+        # Twilio credentials
+        account_sid = 'your_account_sid'  # Replace with your Twilio Account SID
+        auth_token = 'your_auth_token'  # Replace with your Twilio Auth Token
+        from_number = 'your_twilio_number'  # Replace with your Twilio phone number
+        to_number = 'recipient_phone_number'  # Replace with the recipient's phone number
+
+        client = Client(account_sid, auth_token)
+
+        try:
+            message = client.messages.create(
+                body=body,
+                from_=from_number,
+                to=to_number
+            )
+            print("SMS sent successfully!")
+        except Exception as e:
+            print(f"Failed to send SMS: {e}")
 
     def record_data(self):
         # Record current system data
@@ -102,6 +149,8 @@ class LifeSupportSystem:
         if self.oxygen_level < 20:
             self.is_emergency = True
             print(f"EMERGENCY! Oxygen levels critically low: {self.oxygen_level:.2f}%")
+            self.send_email("Critical Alert: Oxygen Level", f"Oxygen levels critically low: {self.oxygen_level:.2f}%")
+            self.send_sms(f"Critical Alert: Oxygen levels critically low: {self.oxygen_level:.2f}%")
         elif self.oxygen_level < 50:
             print(f"Warning: Oxygen levels dropping: {self.oxygen_level:.2f}%")
         else:
@@ -112,6 +161,8 @@ class LifeSupportSystem:
         if self.water_recycled < 20:
             self.is_emergency = True
             print(f"EMERGENCY! Water levels critically low: {self.water_recycled:.2f}%")
+            self.send_email("Critical Alert: Water Level", f"Water levels critically low: {self.water_recycled:.2f}%")
+            self.send_sms(f"Critical Alert: Water levels critically low: {self.water_recycled:.2f}%")
         elif self.water_recycled < 50:
             print(f"Warning: Water levels dropping: {self.water_recycled:.2f}%")
         else:
@@ -133,6 +184,15 @@ class LifeSupportSystem:
             self.temperature = 22
             self.is_emergency = False
             print("Emergency resolved. Systems back to normal.")
+
+            # Send email and SMS notifications
+            self.send_email(
+                subject="Emergency Response Activated",
+                body=f"Oxygen levels critically low. Resolved. New levels: Oxygen: {self.oxygen_level:.2f}%, Water: {self.water_recycled:.2f}%, Temperature: {self.temperature:.2f}°C"
+            )
+            self.send_sms(
+                body=f"Emergency resolved! New levels - Oxygen: {self.oxygen_level:.2f}%, Water: {self.water_recycled:.2f}%, Temperature: {self.temperature:.2f}°C"
+            )
 
     def real_time_monitoring(self):
         print("\n--- Monitoring Life Support Systems ---")
