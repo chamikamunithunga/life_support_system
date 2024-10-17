@@ -6,6 +6,12 @@
 ## Overview
 This project simulates a life support system for a space environment, monitoring critical parameters such as oxygen levels, water recycling, and temperature control. It integrates machine learning models for predictive maintenance and anomaly detection, as well as biometric monitoring of crew members' health.
 
+
+
+![1677546879892](https://github.com/user-attachments/assets/7be4a5ca-0dce-4d82-a6cb-a4475f96919d)
+
+
+
 ## Features
 - **Real-time Monitoring**: Continuously tracks oxygen levels, water recycling, and temperature.
 - **Predictive Maintenance**: Uses machine learning to predict future temperature based on historical data.
