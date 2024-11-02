@@ -20,6 +20,8 @@ This project simulates a life support system for a space environment, monitoring
 - **Health Recommendations**: Provides recommendations for crew members based on their health data.
 - **Alerts and Notifications**: Sends alerts when critical system states are detected, including low oxygen or water levels.
 
+
+
 ## Requirements
 - Python 3.x
 - Libraries:
